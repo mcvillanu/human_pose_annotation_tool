@@ -113,6 +113,8 @@ class Noter:
             else:
                 img = imgs
 
+            img, kpts = self.upscale(img, kpts)
+
             tmp = img.astype(np.uint8).copy()
             kpts_back = kpts.copy()
 
@@ -129,7 +131,8 @@ class Noter:
                 key = cv2.waitKey(1) & 0xFF
 
                 if key == ord('\n') or key == ord('\r'):
-                    self.current_json_dict = dict(zip(JOINTS, kpts.copy().tolist()[0]))
+                    _, d_k = self.downscale(kpts=kpts)
+                    self.current_json_dict = dict(zip(JOINTS, d_k.copy().tolist()[0]))
                     cv2.destroyAllWindows()
                     with open(current_json_path, 'w') as f:
                         json.dump(self.current_json_dict, f)
@@ -215,13 +218,6 @@ class Noter:
                         self.error.set('....')
                         tmp[:, :, :] = img.astype(np.uint8).copy()[:, :, :]
                         np.copyto(kpts_back, kpts)
-                        print('tmp')
-                        print(tmp[:, :, :])
-                        print('kpts back')
-                        print(kpts_back)
-                        print('kpts ')
-
-                        print(kpts)
                         self.draw_kpts(tmp, kpts, self.radius)
                         self.reset()
 
@@ -239,7 +235,6 @@ class Noter:
 
     @staticmethod
     def draw_kpts(img, kpts, radius):
-        print('kpts INSIE DRAW')
         print(kpts)
         for obj in range(kpts.shape[0]):
             for i, el in enumerate(kpts[obj]):
@@ -247,7 +242,7 @@ class Noter:
                     break
                 if el[0] >= 0 and el[1] >= 0:
                     cv2.circle(img, (int(el[0]), int(el[1])), radius, JOINTS_COLOR[i], -1)
-                    cv2.putText(img,'{}'.format(JOINTS[i]), (int(el[0]) + 5, int(el[1])+ 5), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=1, color=(0,0,0), thickness=2)
+                    cv2.putText(img,'{}'.format(JOINTS[i]), (int(el[0]) + 5, int(el[1])+ 5), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=1, color=(255,0,255), thickness=2)
     def search_near(self, x, y, kpts):
         for obj in range(kpts.shape[0]):
             for i, el in enumerate(kpts[obj]):
@@ -303,11 +298,31 @@ class Noter:
                 self.error.set("Confirm modfying?")
                 self.master.update()
 
+    @staticmethod
+    def __resize(img, kpts, scale):
+        up = up_k = None
+        if img is not None:
+            up = cv2.resize(img.copy(), None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+        if kpts is not None:
+            up_k = kpts.copy()
+            for obj in range(up_k.shape[0]):
+                for el in up_k[obj]:
+                    if el[0] > 0 and el[1] > 0:
+                        el[0] *= scale
+                        el[1] *= scale
+        return up, up_k
+
+    def upscale(self, img=None, kpts=None):
+        return self.__resize(img, kpts, self.scale)
+
+    def downscale(self, img=None, kpts=None):
+        return self.__resize(img, kpts, 1 / self.scale)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, dest='data_dir', help='Data directory.', required=True)
     parser.add_argument('--out', type=str, default='good_annotations', dest='out', help='Output file path.')
-    parser.add_argument('--scale', type=float, default=1, dest='scale', help='Depth image scale.')
+    parser.add_argument('--scale', type=float, default=3, dest='scale', help='Depth image scale.')
     parser.add_argument('--radius', type=int, default=6, dest='radius', help='Joint annotation radius.')
     parser.add_argument('--next', type=int, default=1, dest='next', help='Skippin [next] image.')
     args = parser.parse_args().__dict__

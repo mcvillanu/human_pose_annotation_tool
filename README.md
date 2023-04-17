@@ -2,13 +2,9 @@
 
 ![Example image_1](https://github.com/aimagelab/human-pose-annotation-tool/blob/master/img/example_1.png)
 
-We aim to create a simple yet effective tool for create and modify annotation for Body Pose Estimation over depth images.
-The vast majority of available datasets are not precisely noted, usually annotations are obtained using the [Kinect SDK](https://www.microsoft.com/en-us/research/project/human-pose-estimation-for-kinect/ "Microsoft Page"), which is supposed to works in a limited environment, returning incorrect annotation for general case-of-use.
+We aim to create a simple yet effective tool for create and modify annotation for Body Pose Estimation over RGB images.
 
-![Example image_4](https://github.com/aimagelab/human-pose-annotation-tool/blob/master/img/example_4.png)
-
-Our tool takes into account pre-existing annotations, plotting Body Joints over depth frames, for using such informations as a starting point. The RGB frame is also shown, to allow an easier reference.
-We noted down 3329 frames from watch-n-patch for our Body Pose Estimation CNN, annotations are available [here](http://imagelab.ing.unimore.it/depthbodypose).
+Our tool can be used for annotating new images, or adjusting existing images. The annotation outputs are in a simple to use JSON format. Joints that are not included in the image are denoted as [-1,-1].
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. There's not much to do, just install prerequisites and download all the files.
@@ -59,13 +55,3 @@ python Noter.py --data_dir <path_to_dataset> --out <optional> --k <optional> --n
 - `--next`, choose how many frame you want to skip after everyone you note down.
 - `--scale` & -`--radius`, choose the dimension of images and keypoint visualization in the plot.
 - `--split`, additional parameter for custom datasets.
-
-## Authors
-
-* **Andrea D'Eusanio** - [Deusy94](https://github.com/Deusy94)
-* **Stefano Pini** - [Stefano](https://github.com/stefanopini)
-* **Guido Borghi** - [Gdburg](https://github.com/gdubrg)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

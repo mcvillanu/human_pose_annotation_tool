@@ -52,7 +52,7 @@ class ComposedDataset(Dataset):
         image_name_to_joints = dict()
         image_path = os.path.join(self.data_dir, IMAGE_FOLDER)
         annotation_path = os.path.join(self.data_dir, ANNOTATION_FOLDER)
-        generic_joint_json = {joint : (random.randint(0,50), random.randint(0,50)) for joint in JOINTS}
+        generic_joint_json = {joint : (random.randint(10,50), random.randint(10,50)) for joint in JOINTS}
 
         print(image_path)
 
